@@ -48,7 +48,11 @@ class RotaryEmbedding(nn.Module):
         return self.cos_cached, self.sin_cached
 
     def forward(self, q, k):
-        batch, num_heads, seq_len, head_dim = q.shape
+        """
+        Designed to operate on queries and keys that are compatible with
+        [batch_size, n_heads_per_partition, seq_len, head_dim]
+        """
+        batch, seq_len, head_dim = q.shape
         cos, sin = self.cos_sin(seq_len, q.device, q.dtype)
 
         return (q * cos) + (rotate_every_two(q) * sin), (k * cos) + (rotate_every_two(k) * sin)
